@@ -3,8 +3,9 @@
 #include <math.h>
 #include <time.h>
 
-#define GRAPH_SIZE 1000
+#define GRAPH_SIZE 25
 #define DEGREE_MAX 200
+#define TOURNAMENT_LENGTH 10
 //#define COEFF Algo
 /*
 typedef struct Adjacency_list{
@@ -15,22 +16,39 @@ typedef struct Adjacency_list{
 
 typedef struct graph_net{
     int ** adjacency_vector;
-    int * degree;
-    int behaviour;
+    int *behaviour;
+    int *wallet;
+    int **behaviour_aux;
 }grafo;
+
+/*
+* 0: Copycat - Start coop, replicate last move
+* 1: Cheater - Always cheat
+* 2: Cooperator - Always Coop
+* 3: Grudger - Always coop. If cheated, always cheat
+* 4: Detective - Starts coop, coop, cheat, coop. If cheated, becomes copycat, else always cheat.
+* 5: Copykitten - Cheats only if 2x cheat
+* 6: Simpleton - Start cooperate, if cooperated back, keeps same move, if cheated, changes move
+* 7: Random - Coops or cheats randomly
+*
+*/
 
 
 grafo * graph_generator (int size, int degree);
 
-void random_walker(grafo* graph);
+int action_selector(grafo* graph, int agent, int opponent, int round);
+
+void tournament_arc(grafo* graph);
+
+void trust_game (grafo * graph, int agent, int opponent, int action_a, int action_o);
 
 void graph_printer(grafo* graph);
+
 int main (void){
     srand(time(NULL));
     grafo* graph = graph_generator(GRAPH_SIZE, DEGREE_MAX);
     graph_printer(graph);
-    random_walker(graph);
-
+    tournament_arc(graph);
     return 1;
 }
 
@@ -49,9 +67,11 @@ grafo* graph_generator(int size, int degree){
 
 
     auxiliarymatrix = (int **) malloc(sizeof(int *)* size);
-    creator->degree = (int *) malloc(sizeof(int)* size);
+    creator->behaviour = (int * ) malloc(sizeof(int)*size);
+    creator->wallet = (int * ) malloc(sizeof(int)*size);
     for(i = 0; i < size; i++)
         auxiliarymatrix[i] = (int*) malloc(sizeof(int)*size);
+        
     creator->adjacency_vector=auxiliarymatrix;
     for(i = 0; i < size; i++){
         for(j = 0; j < size ; j++){
@@ -60,52 +80,317 @@ grafo* graph_generator(int size, int degree){
     }
     for (i = 0; i < size; i++)
     {
+        creator->behaviour[i] = rand()%8;
         for(j = 0; j < i; j++){
             randomizer = rand()%2;
-            if(randomizer == 1 && creator->adjacency_vector[i][creator->degree[i]] == -1)
+            if(randomizer == 1)
             {
-                creator->adjacency_vector[i][creator->degree[i]] = j;
-                creator->adjacency_vector[j][creator->degree[j]] = i;
-                creator->degree[i] ++;
-                creator->degree[j] ++;
+                creator->adjacency_vector[i][j] = 1;
+                creator->adjacency_vector[j][i] = 1;
             }
         } 
     }
+    creator->behaviour_aux = (int **) malloc(sizeof(int*)*size);
 
+    for(i = 0; i < size; i++){
+        creator->behaviour_aux[i] = (int *) malloc(sizeof(int)*size);
+        creator->wallet[i] = 100;
+    }
     return creator;
+
 }
 
 
 void graph_printer(grafo* graph){
     int i = 0;
     int j = 0;
+    printf("Meet your challengers: \n");
     for(i = 0; i < GRAPH_SIZE ; i++){
         //for(j = 0; j < graph->degree[i]; j++)
-            printf("%d \n", graph->degree[i]);
+            printf("%d \n", graph->behaviour[i]);
         //printf("\n");
     }
 }
 
-void random_walker (grafo* graph){
-    int start = rand()%GRAPH_SIZE;
-    int end = start;
-    int road = start;
-    int next = 0;
-    int RNG = 0;
-    int steps = 0;
-    while(end == start){
-        end = rand()%GRAPH_SIZE;
+int action_selector(grafo* graph, int agent, int opponent, int round){
+    
+    switch(graph->behaviour[agent]){
+        case 0:
+            if(round == 0)
+                return 1;
+            return graph->behaviour_aux[agent][opponent];
+            break;
+        case 1:
+            return 0;
+            break;
+        case 2:
+            return 1;
+            break;
+        case 3:
+            if(round == 0)
+                return 1;
+            if (graph->behaviour_aux[agent][opponent] == 1)
+                return 0;
+            else if(graph->behaviour_aux[agent][opponent] == 0)
+                return 1;
+            break;
+        case 4:
+            if(round == 0)
+                return 1;
+            if(round == 1)
+                return 1;
+            if(round == 2)
+                return 0;
+            if(round == 3)
+                return 1;
+            if(graph->behaviour_aux[agent][opponent] == 0)
+                return 0;
+            if(graph->behaviour_aux[agent][opponent] == 1)
+                graph->behaviour[agent] = 0;
+                return 1;
+            break;
+        case 5:
+            if(round == 0)
+                return 1;
+            if(graph->behaviour_aux[agent][opponent] <= 1)
+                return 1;
+            else{
+                return 0;
+            }
+            break;
+        case 6:
+            if(round == 0)
+                return 1;
+            if(graph->behaviour_aux[agent][opponent] == 0)
+                return 1;
+            if(graph->behaviour_aux[agent][opponent]%2 == 0)
+                return 1;
+            else
+                return 0;
+            break;
+        case 7:
+            return rand()%2;
+            break;
+        default:
+            return 1;
+            break;
+    }
+    printf("Fatal ERROR: no action selected \n");
+    return 1;
+}
+
+void trust_game (grafo * graph, int agent, int opponent, int action_a, int action_o){
+    if(action_a == 1 && action_o == 1){
+        graph->wallet[agent] +=2;
+        graph->wallet[opponent] +=2;
+        switch(graph->behaviour[agent]){
+            case 0:
+                graph->behaviour_aux[agent][opponent] = 1; 
+                break;
+            case 3:
+                if(graph->behaviour_aux[agent][opponent] != 1)
+                    graph->behaviour_aux[agent][opponent] = 0;
+                break;
+            case 4:
+                if(graph->behaviour_aux[agent][opponent] != 1)
+                    graph->behaviour_aux[agent][opponent] = 0;
+                break;
+            case 5:
+                graph->behaviour_aux[agent][opponent] = 0;
+                break;
+            case 6:
+                graph->behaviour_aux[agent][opponent] = 0;
+                break;
+            case 7:
+                graph->behaviour_aux[agent][opponent] = 0;
+                break;
+            default: break;
+        }
+        switch(graph->behaviour[opponent]){
+            case 0:
+                graph->behaviour_aux[opponent][agent] = 1; 
+                break;
+            case 3:
+                if(graph->behaviour_aux[opponent][agent] != 1)
+                    graph->behaviour_aux[opponent][agent] = 0;
+                break;
+            case 4:
+                if(graph->behaviour_aux[opponent][agent] != 1)
+                    graph->behaviour_aux[opponent][agent] = 0;
+                break;
+            case 5:
+                graph->behaviour_aux[opponent][agent] = 0;
+                break;
+            case 6:
+                graph->behaviour_aux[opponent][agent] = 0;
+                break;
+            case 7:
+                graph->behaviour_aux[opponent][agent] = 0;
+                break;
+            default: break;
+        }
+        return;
+    }else if(action_a == 1 && action_o == 0){
+        graph->wallet[opponent] +=3;
+        graph->wallet[agent] -=1;
+        switch(graph->behaviour[agent]){
+            case 0:
+                graph->behaviour_aux[agent][opponent] = 0; 
+                break;
+            case 3:
+                graph->behaviour_aux[agent][opponent] = 1;
+                break;
+            case 4:
+                graph->behaviour_aux[agent][opponent] = 1;
+                break;
+            case 5:
+                graph->behaviour_aux[agent][opponent] += 1;
+                break;
+            case 6:
+                graph->behaviour_aux[agent][opponent] += 1;
+                break;
+            case 7:
+                graph->behaviour_aux[agent][opponent] = 0;
+                break;
+            default: break;
+        }
+        switch(graph->behaviour[opponent]){
+            case 0:
+                graph->behaviour_aux[opponent][agent] = 1; 
+                break;
+            case 3:
+                break;
+            case 4:
+                if(graph->behaviour_aux[opponent][agent] != 1)
+                    graph->behaviour_aux[opponent][agent] = 0;
+                break;
+            case 5:
+                graph->behaviour_aux[opponent][agent] = 0;
+                break;
+            case 6:
+                graph->behaviour_aux[opponent][agent] = 0;
+                break;
+            case 7:
+                graph->behaviour_aux[opponent][agent] = 0;
+                break;
+            default: break;
+        }
+        return;
+    }else if(action_a == 0 && action_o == 0){
+         switch(graph->behaviour[agent]){
+            case 0:
+                graph->behaviour_aux[agent][opponent] = 0; 
+                break;
+            case 3:
+                break;
+            case 4:
+                graph->behaviour_aux[agent][opponent] = 1;
+                break;
+            case 5:
+                graph->behaviour_aux[agent][opponent] += 1;
+                break;
+            case 6:
+                graph->behaviour_aux[agent][opponent] += 1;
+                break;
+            case 7:
+                graph->behaviour_aux[agent][opponent] = 0;
+                break;
+            default: break;
+        }
+        switch(graph->behaviour[opponent]){
+            case 0:
+                graph->behaviour_aux[opponent][agent] = 0; 
+                break;
+            case 3:
+                break;
+            case 4:
+                if(graph->behaviour_aux[opponent][agent] != 1)
+                    graph->behaviour_aux[opponent][agent] = 0;
+                break;
+            case 5:
+                graph->behaviour_aux[opponent][agent] += 1;
+                break;
+            case 6:
+                graph->behaviour_aux[opponent][agent] += 1;
+                break;
+            case 7:
+                graph->behaviour_aux[opponent][agent] = 0;
+                break;
+            default: break;
+        }
+        return;
+    }else if(action_a == 0 && action_o == 1){
+        graph->wallet[agent] +=3;
+        graph->wallet[opponent] -=1;
+        switch(graph->behaviour[opponent]){
+            case 0:
+                graph->behaviour_aux[opponent][agent] = 0; 
+                break;
+            case 3:
+                graph->behaviour_aux[opponent][agent] = 1;
+                break;
+            case 4:
+                graph->behaviour_aux[opponent][agent] = 1;
+                break;
+            case 5:
+                graph->behaviour_aux[opponent][agent] += 1;
+                break;
+            case 6:
+                graph->behaviour_aux[opponent][agent] += 1;
+                break;
+            case 7:
+                graph->behaviour_aux[opponent][agent] = 0;
+                break;
+            default: break;
+        }
+        switch(graph->behaviour[agent]){
+            case 0:
+                graph->behaviour_aux[agent][opponent] = 1; 
+                break;
+            case 3:
+                break;
+            case 4:
+                if(graph->behaviour_aux[agent][opponent] != 1)
+                    graph->behaviour_aux[agent][opponent] = 0;
+                break;
+            case 5:
+                graph->behaviour_aux[agent][opponent] = 0;
+                break;
+            case 6:
+                graph->behaviour_aux[agent][opponent] = 0;
+                break;
+            case 7:
+                graph->behaviour_aux[agent][opponent] = 0;
+                break;
+            default: break;
+        }
+        return;
+    }
+    return;
+}
+void tournament_arc(grafo* graph){
+    int round = 0;
+    int action1 = 0;
+    int action2 = 0;
+    int i = 0;
+    int j = 0;
+    printf("LET'S GET READY TO RUMBLE !!!! \n \n \n");
+    for(round = 0; round < TOURNAMENT_LENGTH; round++){
+        for(i = 0; i< GRAPH_SIZE; i++){
+            for(j = 0; j< i; j++)
+            {
+                if(graph->adjacency_vector[i][j] == 1){
+                    action1 = action_selector(graph, i, j, round);
+                    action2 = action_selector(graph, j, i, round);
+                    trust_game(graph, i, j, action1, action2);
+                }
+            }
+        }
     }
 
-    printf("Started at node %d: \n", start);
-    printf("%d", start);
-    while(road != end){
-        RNG =  rand()%graph->degree[road];
-        next = graph->adjacency_vector[road][RNG];
-        printf("-> %d \n", next);
-        road = next;
-        steps += 1;
+    printf("Final balance: \n");
+    for(i = 0; i <  GRAPH_SIZE; i++){
+        printf("Player %d: %d \n", i + 1, graph->wallet[i]);
     }
-    printf("Took %d steps. \n", steps);
-    printf("Ended successfully at: %d = %d \n", end, road);
 }
+
