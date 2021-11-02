@@ -8,12 +8,10 @@ random.seed(4)
 
 def BA_generator(N,k):
     adjencyMatrix=[[0 for _ in range(N)] for _ in range(N)]
-    adjencyMatrix[0][1]= 1
-    adjencyMatrix[N-1][N-2] = 1
 
 
-    for i in range(1,N-1):
-        adjencyMatrix[i][i+1]=1
+    for i in range(0,N-1):
+        adjencyMatrix[i][(i+1)%N]=1
         adjencyMatrix[i][i-1]=1
         
     print(adjencyMatrix)
@@ -49,6 +47,6 @@ def BA_generator(N,k):
     print(nE)
     print(E)
     print(adjencyMatrix)
-
+    return adjencyMatrix
 
 BA_generator(4,3)
