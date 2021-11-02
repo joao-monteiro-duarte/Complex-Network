@@ -446,6 +446,7 @@ void natural_selection(grafo * graph){
             }
             graph->behaviour_aux[i][j] = 0;
         }
+        
         neighbour_select = rand()%aux;
         neighbour = aux_vector[neighbour_select];
         if(graph->wallet[i] < graph->wallet[neighbour]){
@@ -453,6 +454,9 @@ void natural_selection(grafo * graph){
         }
         aux = 0;
         
+    }
+    for(i = 0; i < GRAPH_SIZE; i++){
+        graph->wallet[i] = 100;
     }
 }
 void tournament_arc(grafo* graph){
