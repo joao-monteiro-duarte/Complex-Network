@@ -3,9 +3,10 @@
 #include <math.h>
 #include <time.h>
 
-#define GRAPH_SIZE 25
+#define GRAPH_SIZE 8
+#define DEBUG 1
 #define DEGREE_MAX 200
-#define TOURNAMENT_LENGTH 10
+#define TOURNAMENT_LENGTH 6
 //#define COEFF Algo
 /*
 typedef struct Adjacency_list{
@@ -76,7 +77,22 @@ grafo* graph_generator(int size, int degree){
     for(i = 0; i < size; i++){
         for(j = 0; j < size ; j++){
             creator->adjacency_vector[i][j] = -1;
+            if(DEBUG == 1)
+                creator->adjacency_vector[i][j] = 1;
         }
+    }
+    if(DEBUG == 1)
+    {
+        for(i = 0; i < size; i++){
+            creator->behaviour[i] = i;
+        }
+        creator->behaviour_aux = (int **) malloc(sizeof(int*)*size);
+
+        for(i = 0; i < size; i++){
+            creator->behaviour_aux[i] = (int *) malloc(sizeof(int)*size);
+            creator->wallet[i] = 100;
+        }
+        return creator;
     }
     for (i = 0; i < size; i++)
     {
@@ -376,13 +392,23 @@ void tournament_arc(grafo* graph){
     int j = 0;
     printf("LET'S GET READY TO RUMBLE !!!! \n \n \n");
     for(round = 0; round < TOURNAMENT_LENGTH; round++){
+        printf("\nROUND %d! GO! \n \n", round);
         for(i = 0; i< GRAPH_SIZE; i++){
+            printf("Player %d analysis: \n", i);
             for(j = 0; j< i; j++)
             {
                 if(graph->adjacency_vector[i][j] == 1){
                     action1 = action_selector(graph, i, j, round);
                     action2 = action_selector(graph, j, i, round);
                     trust_game(graph, i, j, action1, action2);
+                    if(action1 == 1 && action2 == 1)
+                        printf("Jolly cooperation between %d and %d \n", i, j);
+                    if(action1 == 1 && action2 == 0)
+                        printf("Lies, Deception! %d betrayed by %d ! \n", i, j);
+                    if(action1 == 0 && action2 == 1)
+                        printf("Top 10 anime betrayals! %d betrays %d ! \n", i, j);
+                    if(action1 == 0 && action2 == 0)
+                        printf("%d and %d are bitter enemies \n", i, j);
                 }
             }
         }
