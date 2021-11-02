@@ -3,10 +3,11 @@
 #include <math.h>
 #include <time.h>
 
-#define GRAPH_SIZE 25
+#define GRAPH_SIZE 4000
 #define DEBUG 0
 #define DEGREE_MAX 200
-#define TOURNAMENT_LENGTH 5
+#define TOURNAMENT_LENGTH 10
+#define NR_TOURNAMENTS 10
 //#define COEFF Algo
 /*
 typedef struct Adjacency_list{
@@ -20,6 +21,7 @@ typedef struct graph_net{
     int *behaviour;
     int *wallet;
     int **behaviour_aux;
+    int * average_aux;
 }grafo;
 
 /*
@@ -34,6 +36,9 @@ typedef struct graph_net{
 *
 */
 
+void quota_deffiner(grafo* graph);
+
+void natural_selection(grafo * graph);
 
 grafo * graph_generator (int size, int degree);
 
@@ -47,9 +52,15 @@ void graph_printer(grafo* graph);
 
 int main (void){
     srand(time(NULL));
+    int i = 0;
     grafo* graph = graph_generator(GRAPH_SIZE, DEGREE_MAX);
-    graph_printer(graph);
+    //graph_printer(graph);
     tournament_arc(graph);
+    printf("Final Results: \n");
+    for(i = 0; i<8;i++)
+    {
+        printf("Strategy %d average: %d \n",i, graph->average_aux[i]/NR_TOURNAMENTS);
+    }
     return 1;
 }
 
@@ -70,6 +81,7 @@ grafo* graph_generator(int size, int degree){
     auxiliarymatrix = (int **) malloc(sizeof(int *)* size);
     creator->behaviour = (int * ) malloc(sizeof(int)*size);
     creator->wallet = (int * ) malloc(sizeof(int)*size);
+    creator->average_aux = (int *) malloc(sizeof(int)*8);
     for(i = 0; i < size; i++)
         auxiliarymatrix[i] = (int*) malloc(sizeof(int)*size);
         
@@ -77,11 +89,12 @@ grafo* graph_generator(int size, int degree){
     for(i = 0; i < size; i++){
         for(j = 0; j < size ; j++){
             creator->adjacency_vector[i][j] = -1;
-            if(DEBUG == 1)
+            /*if(DEBUG == 1)
                 creator->adjacency_vector[i][j] = 1;
+            */
         }
     }
-    if(DEBUG == 1)
+    /*if(DEBUG == 1)
     {
         for(i = 0; i < size; i++){
             creator->behaviour[i] = i;
@@ -93,7 +106,7 @@ grafo* graph_generator(int size, int degree){
             creator->wallet[i] = 100;
         }
         return creator;
-    }
+    }*/
     for (i = 0; i < size; i++)
     {
         creator->behaviour[i] = rand()%8;
@@ -120,11 +133,18 @@ grafo* graph_generator(int size, int degree){
 void graph_printer(grafo* graph){
     int i = 0;
     int j = 0;
+    int strat_count[8] = {0};
     printf("Meet your challengers: \n");
     for(i = 0; i < GRAPH_SIZE ; i++){
         //for(j = 0; j < graph->degree[i]; j++)
-            printf("%d \n", graph->behaviour[i]);
+        j = graph->behaviour[i];
+        strat_count[j] ++;
         //printf("\n");
+    }
+
+    for(i = 0; i < 8; i++){
+        printf("Strategy %d count: %d \n", i, strat_count[i]);
+        graph->average_aux[i] += strat_count[i];
     }
 }
 
@@ -382,39 +402,101 @@ void trust_game (grafo * graph, int agent, int opponent, int action_a, int actio
     }
     return;
 }
+
+void quota_deffiner(grafo* graph){
+    int quota = GRAPH_SIZE/8;
+    int i = 0;
+    int aux = 0;
+    int strat_number[8] = {0};
+    for(i = 0; i < GRAPH_SIZE; i++){
+        graph->behaviour[i] = rand()%8;
+        aux = graph->behaviour[i];
+        while(strat_number[aux] >= quota)
+        {
+            graph->behaviour[i] = rand()%8;
+            aux = graph->behaviour[i];
+        }
+        strat_number[aux] += 1;
+    }
+}
+
+void natural_selection(grafo * graph){
+    int * old_vector = NULL;
+    int i = 0;
+    int j = 0;
+    int aux = 0;
+    int neighbour_select = 0;
+    int neighbour = 0;
+    int * aux_vector = NULL;
+
+    aux_vector = (int *) malloc(sizeof(int)*GRAPH_SIZE);
+    old_vector = (int *) malloc(sizeof(int)*GRAPH_SIZE);
+
+    for(i = 0; i < GRAPH_SIZE; i++)
+    {
+        old_vector[i] = graph->behaviour[i];
+    }
+
+    for(i = 0; i < GRAPH_SIZE; i++){
+        for(j = 0; j < GRAPH_SIZE; j++)
+        {
+            if(graph->adjacency_vector[i][j] == 1){
+                aux_vector[aux] = j;
+                aux++; 
+            }
+            graph->behaviour_aux[i][j] = 0;
+        }
+        neighbour_select = rand()%aux;
+        neighbour = aux_vector[neighbour_select];
+        if(graph->wallet[i] < graph->wallet[neighbour]){
+            graph->behaviour[i] = old_vector[neighbour];
+        }
+        aux = 0;
+        
+    }
+}
 void tournament_arc(grafo* graph){
     int round = 0;
     int action1 = 0;
     int action2 = 0;
     int i = 0;
     int j = 0;
+    int tournament = 0;
     printf("LET'S GET READY TO RUMBLE !!!! \n \n \n");
-    for(round = 0; round < TOURNAMENT_LENGTH; round++){
-        printf("\nROUND %d! GO! \n \n", round);
-        for(i = 0; i< GRAPH_SIZE; i++){
-            printf("Player %d analysis: \n", i);
-            for(j = 0; j< i; j++)
-            {
-                if(graph->adjacency_vector[i][j] == 1){
-                    action1 = action_selector(graph, i, j, round);
-                    action2 = action_selector(graph, j, i, round);
-                    trust_game(graph, i, j, action1, action2);
-                    if(action1 == 1 && action2 == 1)
-                        printf("Jolly cooperation between %d and %d \n", i, j);
-                    if(action1 == 1 && action2 == 0)
-                        printf("Lies, Deception! %d betrayed by %d ! \n", i, j);
-                    if(action1 == 0 && action2 == 1)
-                        printf("Plot twist! %d betrays %d ! \n", i, j);
-                    if(action1 == 0 && action2 == 0)
-                        printf("%d and %d are bitter enemies \n", i, j);
+    for(tournament = 0; tournament<NR_TOURNAMENTS; tournament++){
+        printf("Tournament nr: %d \n", tournament);
+        quota_deffiner(graph);
+        //graph_printer(graph);
+        for(round = 0; round < TOURNAMENT_LENGTH; round++){
+            //printf("\nROUND %d! GO! \n \n", round);
+            for(i = 0; i< GRAPH_SIZE; i++){
+                //printf("Player %d analysis: \n", i);
+                for(j = 0; j< i; j++)
+                {
+                    if(graph->adjacency_vector[i][j] == 1){
+                        action1 = action_selector(graph, i, j, round);
+                        action2 = action_selector(graph, j, i, round);
+                        trust_game(graph, i, j, action1, action2);
+                        /*if(action1 == 1 && action2 == 1)
+                            printf("Jolly cooperation between %d and %d \n", i, j);
+                        if(action1 == 1 && action2 == 0)
+                            printf("Lies, Deception! %d betrayed by %d ! \n", i, j);
+                        if(action1 == 0 && action2 == 1)
+                            printf("Plot twist! %d betrays %d ! \n", i, j);
+                        if(action1 == 0 && action2 == 0)
+                            printf("%d and %d are bitter enemies \n", i, j);*/
+                    }
                 }
             }
+            natural_selection(graph);
         }
+        graph_printer(graph);
     }
+        
 
-    printf("Final balance: \n");
+   /* printf("Final balance: \n");
     for(i = 0; i <  GRAPH_SIZE; i++){
         printf("Player %d: %d \n", i + 1, graph->wallet[i]);
-    }
+    }*/
 }
 
