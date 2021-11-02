@@ -3,10 +3,10 @@
 #include <math.h>
 #include <time.h>
 
-#define GRAPH_SIZE 8
-#define DEBUG 1
+#define GRAPH_SIZE 25
+#define DEBUG 0
 #define DEGREE_MAX 200
-#define TOURNAMENT_LENGTH 6
+#define TOURNAMENT_LENGTH 5
 //#define COEFF Algo
 /*
 typedef struct Adjacency_list{
@@ -154,16 +154,16 @@ int action_selector(grafo* graph, int agent, int opponent, int round){
             if(round == 0)
                 return 1;
             if(round == 1)
-                return 1;
-            if(round == 2)
                 return 0;
+            if(round == 2)
+                return 1;
             if(round == 3)
                 return 1;
             if(graph->behaviour_aux[agent][opponent] == 0)
                 return 0;
             if(graph->behaviour_aux[agent][opponent] == 1)
                 graph->behaviour[agent] = 0;
-                return 1;
+                return 0;
             break;
         case 5:
             if(round == 0)
@@ -179,9 +179,7 @@ int action_selector(grafo* graph, int agent, int opponent, int round){
                 return 1;
             if(graph->behaviour_aux[agent][opponent] == 0)
                 return 1;
-            if(graph->behaviour_aux[agent][opponent]%2 == 0)
-                return 1;
-            else
+            else if(graph->behaviour_aux[agent][opponent] == 1)
                 return 0;
             break;
         case 7:
@@ -263,7 +261,7 @@ void trust_game (grafo * graph, int agent, int opponent, int action_a, int actio
                 graph->behaviour_aux[agent][opponent] += 1;
                 break;
             case 6:
-                graph->behaviour_aux[agent][opponent] += 1;
+                graph->behaviour_aux[agent][opponent] = 1;
                 break;
             case 7:
                 graph->behaviour_aux[agent][opponent] = 0;
@@ -284,7 +282,7 @@ void trust_game (grafo * graph, int agent, int opponent, int action_a, int actio
                 graph->behaviour_aux[opponent][agent] = 0;
                 break;
             case 6:
-                graph->behaviour_aux[opponent][agent] = 0;
+                graph->behaviour_aux[opponent][agent] = 1;
                 break;
             case 7:
                 graph->behaviour_aux[opponent][agent] = 0;
@@ -306,7 +304,7 @@ void trust_game (grafo * graph, int agent, int opponent, int action_a, int actio
                 graph->behaviour_aux[agent][opponent] += 1;
                 break;
             case 6:
-                graph->behaviour_aux[agent][opponent] += 1;
+                graph->behaviour_aux[agent][opponent] = 0;
                 break;
             case 7:
                 graph->behaviour_aux[agent][opponent] = 0;
@@ -327,7 +325,7 @@ void trust_game (grafo * graph, int agent, int opponent, int action_a, int actio
                 graph->behaviour_aux[opponent][agent] += 1;
                 break;
             case 6:
-                graph->behaviour_aux[opponent][agent] += 1;
+                graph->behaviour_aux[opponent][agent] = 0;
                 break;
             case 7:
                 graph->behaviour_aux[opponent][agent] = 0;
@@ -352,7 +350,7 @@ void trust_game (grafo * graph, int agent, int opponent, int action_a, int actio
                 graph->behaviour_aux[opponent][agent] += 1;
                 break;
             case 6:
-                graph->behaviour_aux[opponent][agent] += 1;
+                graph->behaviour_aux[opponent][agent] = 1;
                 break;
             case 7:
                 graph->behaviour_aux[opponent][agent] = 0;
@@ -373,7 +371,7 @@ void trust_game (grafo * graph, int agent, int opponent, int action_a, int actio
                 graph->behaviour_aux[agent][opponent] = 0;
                 break;
             case 6:
-                graph->behaviour_aux[agent][opponent] = 0;
+                graph->behaviour_aux[agent][opponent] = 1;
                 break;
             case 7:
                 graph->behaviour_aux[agent][opponent] = 0;
@@ -406,7 +404,7 @@ void tournament_arc(grafo* graph){
                     if(action1 == 1 && action2 == 0)
                         printf("Lies, Deception! %d betrayed by %d ! \n", i, j);
                     if(action1 == 0 && action2 == 1)
-                        printf("Top 10 anime betrayals! %d betrays %d ! \n", i, j);
+                        printf("Plot twist! %d betrays %d ! \n", i, j);
                     if(action1 == 0 && action2 == 0)
                         printf("%d and %d are bitter enemies \n", i, j);
                 }
