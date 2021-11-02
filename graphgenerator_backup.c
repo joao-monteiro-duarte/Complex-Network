@@ -3,7 +3,7 @@
 #include <math.h>
 #include <time.h>
 
-#define GRAPH_SIZE 4000
+#define GRAPH_SIZE 5000
 #define DEBUG 0
 #define DEGREE_MAX 200
 #define TOURNAMENT_LENGTH 10
