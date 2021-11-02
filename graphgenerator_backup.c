@@ -50,6 +50,8 @@ void trust_game (grafo * graph, int agent, int opponent, int action_a, int actio
 
 void graph_printer(grafo* graph);
 
+
+
 int main (void){
     srand(time(NULL));
     int i = 0;
@@ -466,6 +468,8 @@ void tournament_arc(grafo* graph){
     int i = 0;
     int j = 0;
     int tournament = 0;
+    double total_actions = 0;
+    double goodness_counter = 0;
     printf("LET'S GET READY TO RUMBLE !!!! \n \n \n");
     for(tournament = 0; tournament<NR_TOURNAMENTS; tournament++){
         printf("Tournament nr: %d \n", tournament);
@@ -489,12 +493,22 @@ void tournament_arc(grafo* graph){
                             printf("Plot twist! %d betrays %d ! \n", i, j);
                         if(action1 == 0 && action2 == 0)
                             printf("%d and %d are bitter enemies \n", i, j);*/
+                        total_actions += 2;
+                        if(action1 == 1)
+                            goodness_counter++;
+                        if(action2 == 1)
+                            goodness_counter++;
                     }
                 }
             }
             natural_selection(graph);
+            //graph_printer(graph);
         }
+        
         graph_printer(graph);
+        printf("\n \nTotal_actions: %lf \nTotal hope: %lf \nGoodness fraction: %lf \n", total_actions,goodness_counter,(goodness_counter/total_actions)*100);
+        total_actions = 0;
+        goodness_counter = 0;
     }
         
 
