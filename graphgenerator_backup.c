@@ -22,6 +22,7 @@ typedef struct graph_net{
     int *wallet;
     int **behaviour_aux;
     int * average_aux;
+    double goodness_frac;
 }grafo;
 
 /*
@@ -84,6 +85,7 @@ grafo* graph_generator(int size, int degree){
     creator->behaviour = (int * ) malloc(sizeof(int)*size);
     creator->wallet = (int * ) malloc(sizeof(int)*size);
     creator->average_aux = (int *) malloc(sizeof(int)*8);
+    creator->goodness_frac = 0;
     for(i = 0; i < size; i++)
         auxiliarymatrix[i] = (int*) malloc(sizeof(int)*size);
         
@@ -430,6 +432,8 @@ void natural_selection(grafo * graph){
     int neighbour_select = 0;
     int neighbour = 0;
     int * aux_vector = NULL;
+    double temp=0;
+    double rng = 0;
 
     aux_vector = (int *) malloc(sizeof(int)*GRAPH_SIZE);
     old_vector = (int *) malloc(sizeof(int)*GRAPH_SIZE);
@@ -451,9 +455,15 @@ void natural_selection(grafo * graph){
         
         neighbour_select = rand()%aux;
         neighbour = aux_vector[neighbour_select];
-        if(graph->wallet[i] < graph->wallet[neighbour]){
+        temp = 1/(1+exp(-(graph->wallet[neighbour]-graph->wallet[i])));
+        rng = rand()%101;
+        rng = rng/100;
+        if(rng < temp){
             graph->behaviour[i] = old_vector[neighbour];
         }
+        /*if(graph->wallet[i] < graph->wallet[neighbour]){
+            graph->behaviour[i] = old_vector[neighbour];
+        }*/
         aux = 0;
         
     }
@@ -507,11 +517,14 @@ void tournament_arc(grafo* graph){
         
         graph_printer(graph);
         printf("\n \nTotal_actions: %lf \nTotal hope: %lf \nGoodness fraction: %lf \n", total_actions,goodness_counter,(goodness_counter/total_actions)*100);
+        graph->goodness_frac += (goodness_counter/total_actions)*100;
         total_actions = 0;
         goodness_counter = 0;
     }
-        
 
+    graph->goodness_frac=graph->goodness_frac/NR_TOURNAMENTS;
+        
+    printf("Average Global Goodness: %lf \n",graph->goodness_frac);
    /* printf("Final balance: \n");
     for(i = 0; i <  GRAPH_SIZE; i++){
         printf("Player %d: %d \n", i + 1, graph->wallet[i]);
