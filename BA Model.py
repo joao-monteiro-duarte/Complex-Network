@@ -6,47 +6,70 @@ random.seed(4)
 #with probability p_i=k_i/E, where k_i is the degree of that node and E is the total number of
 #edges.
 
-def BA_generator(N,k):
+#N-total number of nodes; m-number of connections made by each node added to the network (in essence, the average degree); 
+# m0-number of initial nodes (m<=m0)
+def BA_generator(N, m, m0):
+    file = open("BAModel{0}NodesAnd{1}AverageDegree.txt".format(N,m*2),"w")
+
     adjencyMatrix=[[0 for _ in range(N)] for _ in range(N)]
+    adjencyMatrix[0][1]=1
+    adjencyMatrix[m0-1][m0-2]=1
 
-
-    for i in range(0,N-1):
-        adjencyMatrix[i][(i+1)%N]=1
+    for i in range(1,m0-1):
+        adjencyMatrix[i][i+1]=1
         adjencyMatrix[i][i-1]=1
-        
-    print(adjencyMatrix)
-    E=N*k
-    nE=N-1
-    prob_list=[1/nE]
-    for _ in range(N-2):
-        prob_list.append(2/nE)
-    prob_list.append(1/nE)
-    print(prob_list)
     
-    while nE != E:
-        n1 = random.randint(0,N-1)
-        while numpy.size(adjencyMatrix[n1])==N-1:
-            n1 = random.randint(0,N-1)
-        r = random.random()
+    nE = (m0-1)
+    #prob_i= #neighbours_i/nE
+    prob_list=[0]*N
 
-        for i in range(N):  
-            if sum(prob_list[:i+1]) > r and i!=n1 :
-                print("n1")
-                print(n1)
-                print("i")
-                print(i)
-                adjencyMatrix[i][n1]=1
-                adjencyMatrix[n1][i]=1
-                nE+=1
-                print(k)
-                print(nE)
-                print(prob_list)
-                prob_list=[k*((nE-1)/nE) for k in prob_list]
-                [prob_list[i],prob_list[n1]] = [numpy.size(adjencyMatrix[i])/nE,numpy.size(adjencyMatrix[n1])/nE]
-                break
-    print(nE)
-    print(E)
+          
+    n=m0
+    while n <= N:
+        print(n)
+
+
+
+        for i in range(n):
+
+            neighbours_i = sum(adjencyMatrix[i])
+            prob_list[i] = prob_list[i-1] + neighbours_i/(2*nE)
+          
+        for _ in range(m+1):
+            r=random.random()
+            i=0
+            while i<n:
+                if prob_list[i] >= r:
+
+                    if adjencyMatrix[n-1][i] == 1:
+                        r=random.random()
+                        i=0
+
+
+                    else:
+                        adjencyMatrix[n-1][i]=1
+
+                        adjencyMatrix[i][n-1]=1
+
+                        prob_list[n-1]=prob_list[n-2]
+                        
+                        break
+                else:
+                    i+=1
+
+        n+=1
+        nE+=m
+    print()
+    for i in range (N):
+        for j in range(N):
+            if adjencyMatrix[i][j]==1:
+                file.write("1 ")
+            else:
+                file.write("0 ")
+
+        file.write("\n")
     print(adjencyMatrix)
     return adjencyMatrix
 
-BA_generator(4,3)
+
+BA_generator(200,2,3)
