@@ -1,0 +1,36 @@
+Graph Creation
+
+The lattice is created using an adjacency matrix, where each node will have as its neighbours the one that,
+in a 2D spatial representation, is directly above, under or to its left or right, resulting in a square shaped
+graph (usar imagem para explicar). Therefore, we need to check if we can create an edge to the node directly before
+it, the one directly after, the two adjacent nodes on the same column but different rows all whilst maintaining a
+square pattern. In other words, that if we have a node that represents one of the edges of the overall square, that
+it does not connect to a node on the opposite edge.
+
+The random graph is created by randomly generating either a 0 or a 1 for each possible link. If a 1 is generated,
+the link is created. This leads to an average degree of N/2, where N is the total number of nodes.
+
+
+
+Trust game:
+
+In order to create a more diverse social setting in order to more accurately portray modern society, we used 8 different
+kinds of personalities:
+
+-A personality that, after starting with cooperation, always plays the same move as the opponent's last.
+
+-A personality that always cheats.
+
+-A personality that always cooperates.
+
+-A personality that cooperates until cheated, after which this personality will always cheat.
+
+-A personality that starts with a pattern and then proceeds to always cheat if it was never cheated or copy the last move if it was cheated.
+
+-A personality that is the same as the first one, except it will only cheat if cheated twice or more times in a row.
+
+-A personality that starts with cooperate, then keeps the same move if cooperated back and changes its move if cheated.
+
+-A personality that always does a random move.
+
+This not only dampens the spread of pure defectors but it also bears greater semblance to modern society.
