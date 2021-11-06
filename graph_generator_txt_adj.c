@@ -199,11 +199,10 @@ int action_selector(grafo* graph, int agent, int opponent, int round){
                 return 1;
             if(round == 3)
                 return 1;
-            if(graph->behaviour_aux[agent][opponent] == 0)
+            if(graph->behaviour_aux[agent][opponent] == -1)
                 return 0;
-            if(graph->behaviour_aux[agent][opponent] == 1)
-                graph->behaviour[agent] = 0;
-                return 0;
+            else 
+                return graph->behaviour_aux[agent][opponent];
             break;
         case 5:
             if(round == 0)
@@ -246,8 +245,8 @@ void trust_game (grafo * graph, int agent, int opponent, int action_a, int actio
                     graph->behaviour_aux[agent][opponent] = 0;
                 break;
             case 4:
-                if(graph->behaviour_aux[agent][opponent] != 1)
-                    graph->behaviour_aux[agent][opponent] = 0;
+                if(graph->behaviour_aux[agent][opponent] != -1)
+                    graph->behaviour_aux[agent][opponent] = 1;
                 break;
             case 5:
                 graph->behaviour_aux[agent][opponent] = 0;
@@ -269,8 +268,8 @@ void trust_game (grafo * graph, int agent, int opponent, int action_a, int actio
                     graph->behaviour_aux[opponent][agent] = 0;
                 break;
             case 4:
-                if(graph->behaviour_aux[opponent][agent] != 1)
-                    graph->behaviour_aux[opponent][agent] = 0;
+                if(graph->behaviour_aux[opponent][agent] != -1)
+                    graph->behaviour_aux[opponent][agent] = 1;
                 break;
             case 5:
                 graph->behaviour_aux[opponent][agent] = 0;
@@ -295,7 +294,7 @@ void trust_game (grafo * graph, int agent, int opponent, int action_a, int actio
                 graph->behaviour_aux[agent][opponent] = 1;
                 break;
             case 4:
-                graph->behaviour_aux[agent][opponent] = 1;
+                graph->behaviour_aux[agent][opponent] = 0;
                 break;
             case 5:
                 graph->behaviour_aux[agent][opponent] += 1;
@@ -315,8 +314,8 @@ void trust_game (grafo * graph, int agent, int opponent, int action_a, int actio
             case 3:
                 break;
             case 4:
-                if(graph->behaviour_aux[opponent][agent] != 1)
-                    graph->behaviour_aux[opponent][agent] = 0;
+                if(graph->behaviour_aux[opponent][agent] != -1)
+                    graph->behaviour_aux[opponent][agent] = 1;
                 break;
             case 5:
                 graph->behaviour_aux[opponent][agent] = 0;
@@ -338,7 +337,7 @@ void trust_game (grafo * graph, int agent, int opponent, int action_a, int actio
             case 3:
                 break;
             case 4:
-                graph->behaviour_aux[agent][opponent] = 1;
+                graph->behaviour_aux[agent][opponent] = 0;
                 break;
             case 5:
                 graph->behaviour_aux[agent][opponent] += 1;
@@ -358,8 +357,7 @@ void trust_game (grafo * graph, int agent, int opponent, int action_a, int actio
             case 3:
                 break;
             case 4:
-                if(graph->behaviour_aux[opponent][agent] != 1)
-                    graph->behaviour_aux[opponent][agent] = 0;
+                graph->behaviour_aux[opponent][agent] = 0;
                 break;
             case 5:
                 graph->behaviour_aux[opponent][agent] += 1;
@@ -384,7 +382,7 @@ void trust_game (grafo * graph, int agent, int opponent, int action_a, int actio
                 graph->behaviour_aux[opponent][agent] = 1;
                 break;
             case 4:
-                graph->behaviour_aux[opponent][agent] = 1;
+                graph->behaviour_aux[opponent][agent] = 0;
                 break;
             case 5:
                 graph->behaviour_aux[opponent][agent] += 1;
@@ -404,8 +402,8 @@ void trust_game (grafo * graph, int agent, int opponent, int action_a, int actio
             case 3:
                 break;
             case 4:
-                if(graph->behaviour_aux[agent][opponent] != 1)
-                    graph->behaviour_aux[agent][opponent] = 0;
+                if(graph->behaviour_aux[agent][opponent] != -1)
+                    graph->behaviour_aux[agent][opponent] = 1;
                 break;
             case 5:
                 graph->behaviour_aux[agent][opponent] = 0;
