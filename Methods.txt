@@ -34,3 +34,61 @@ kinds of personalities:
 -A personality that always does a random move.
 
 This not only dampens the spread of pure defectors but it also bears greater semblance to modern society.
+
+We then spread these personalities evenly across all nodes in each of the graphs, and make each node play the trust game (falta explicar o que é isto) with its neighbours.
+After all nodes have played with all possible opponents, a generational evaluation is made, where all nodes pick a neighbour randomly and compare
+each other's fitness using the function (1/(1+e^-(f_no-f_vizinho)) and then roll a probability from 0 to 100. If the rolled number divided by 100
+is smaller than the fitness function's value, the node changes to its neighbour's strategy. After a new generation of nodes is created, the fitness
+of each node is reset and a new round is played. After 10 rounds, a tournament is done. We then evaluate the number of nodes using each strategy and
+the total number of cooperative actions out of the total number of actions in order to better evaluate the amount of positive strategies remaining.
+
+BA model 1 (BAModel5000Nodesand4Averagedegree.txt)
+Average Global Goodness: 54.986924
+Final Results:
+Strategy 0 average: 747
+Strategy 1 average: 1409
+Strategy 2 average: 171
+Strategy 3 average: 708
+Strategy 4 average: 442
+Strategy 5 average: 389
+Strategy 6 average: 676
+Strategy 7 average: 455
+
+BA model 2 (BAModel500.txt)
+Average Global Goodness: 54.754502
+Final Results:
+Strategy 0 average: 1041
+Strategy 1 average: 841
+Strategy 2 average: 377
+Strategy 3 average: 408
+Strategy 4 average: 742
+Strategy 5 average: 534
+Strategy 6 average: 447
+Strategy 7 average: 605
+
+Lattice (lattice.txt)
+Average Global Goodness: 27.727563
+Final Results:
+Strategy 0 average: 1399
+Strategy 1 average: 2831
+Strategy 2 average: 2
+Strategy 3 average: 2
+Strategy 4 average: 532
+Strategy 5 average: 3
+Strategy 6 average: 2
+Strategy 7 average: 226
+
+
+Random graph
+Average Global Goodness: 18.730757
+Final Results:
+Strategy 0 average: 1400
+Strategy 1 average: 3573
+Strategy 2 average: 0
+Strategy 3 average: 0
+Strategy 4 average: 26
+Strategy 5 average: 0
+Strategy 6 average: 0
+Strategy 7 average: 0
+
+
