@@ -78,7 +78,6 @@ Strategy 5 average: 3
 Strategy 6 average: 2
 Strategy 7 average: 226
 
-
 Random graph
 Average Global Goodness: 18.730757
 Final Results:
@@ -92,3 +91,16 @@ Strategy 6 average: 0
 Strategy 7 average: 0
 
 
+Results & Discussion:
+
+As we can see from ..., the tendency in most graphs is the complete eradication of most strategies with the exception of the cheater and copycat
+(alongside a small strand of detective which, after the first 4 rounds, morphs into one of the two surviving types). In order to best explain this behaviour,
+we must first look at the BA model where the cheater isn't as widespread. In this kind of graph, there are many hubs (nodes with a much larger degree than the others)
+which are able to contain the spread of cheaters if the hub nodes aren't all corrupted by cheaters all at once. (Meter a figura 3 do paper do prof https://www.nature.com/articles/nature06940.pdf)
+Since the other models don't contain such large discrepancies in the degrees of each node, the cheater isn't bounded by a cooperator that trives of other cooperators whilst
+being drained by his surrounding neighbours that have adapted the same strategy as him, allowing for a gradual, unrestrained spread of the cheater archetype.
+On the one hand, the results shown in all graph types other than BA model follow the rational tendency that, regardless of the opposing player's move, cheating always yields the best gain and,
+therefore, easily becomes the most widespread strategy.
+On the other hand, not only does the BA model show that, despite not being the logical outcome, there is an environment where cooperation can thrive over defection, but also is a more
+accurate portrayal of real world relation models, providing an explanation for cooperation in societies such as our own.
+ 
