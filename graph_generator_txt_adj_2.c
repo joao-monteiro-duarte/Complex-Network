@@ -476,8 +476,10 @@ void quota_deffiner(grafo* graph){
             }
         }
         max_old[aux] = graph->behaviour[max_index[aux]];
-        if(max_old[aux] == 2)
+        if(max_old[aux] == 2){
+            auxvector[max_index[aux]] = -1;
             continue;
+        }
 
         graph->behaviour[max_index[aux]] = 2;
         graph->behaviour[min_index[aux]] = max_old[aux];
