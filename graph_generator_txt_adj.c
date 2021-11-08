@@ -8,7 +8,7 @@
 #define DEBUG 0
 #define DEGREE_MAX 200
 #define TOURNAMENT_LENGTH 10
-#define NR_TOURNAMENTS 10
+#define NR_TOURNAMENTS 100
 //#define COEFF Algo
 /*
 typedef struct Adjacency_list{
@@ -192,6 +192,7 @@ int action_selector(grafo* graph, int agent, int opponent, int round){
             break;
         case 4:
             if(round == 0)
+                graph->behaviour_aux[agent][opponent] = -1;
                 return 1;
             if(round == 1)
                 return 0;

@@ -6,6 +6,10 @@ Given a maximum number of nodes, generates a lattice with a square pattern. In o
 each node has at most 4 edges.  Currently generates a lattice representing a 50*100 square 
 graph.
 
+regular.c:
+
+Given a maximum number of nodes, creates a graph where each node is connected to the two
+following and preceding nodes. The first two nodes are connected to the last two nodes.
 
 Graph generator files:
 
@@ -73,6 +77,9 @@ then proceeds to update all necessary auxiliary variables if needed.
 --	Quota deffiner:
 
 Ensures an even spread of all strategies at the start of each tournament.
+
+When using the 2nd version of the adjacency matrix graph generator, we have an additional parameter that
+ensures the main hubs (highest degree nodes) are all occupied solely by cooperative types.
 
 --	Natural selection:
 

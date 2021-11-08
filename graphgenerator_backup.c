@@ -6,8 +6,8 @@
 #define GRAPH_SIZE 5000
 #define DEBUG 0
 #define DEGREE_MAX 200
-#define TOURNAMENT_LENGTH 10
-#define NR_TOURNAMENTS 10
+#define TOURNAMENT_LENGTH 100
+#define NR_TOURNAMENTS 100
 //#define COEFF Algo
 /*
 typedef struct Adjacency_list{

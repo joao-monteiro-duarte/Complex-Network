@@ -9,7 +9,7 @@ random.seed(4)
 #N-total number of nodes; m-number of connections made by each node added to the network (in essence, the average degree); 
 # m0-number of initial nodes (m<=m0)
 def BA_generator(N, m, m0):
-    file = open("BAModel{0}NodesAnd{1}AverageDegree.txt".format(N,m*2),"w")
+    file = open("BAModel{0}NodesAnd{1}AverageDegree3.txt".format(N,m*2),"w")
 
     adjencyMatrix=[[0 for _ in range(N)] for _ in range(N)]
     adjencyMatrix[0][1]=1
@@ -26,7 +26,7 @@ def BA_generator(N, m, m0):
           
     n=m0
     while n <= N:
-        print(n)
+        #print(n)
 
 
 
@@ -59,7 +59,7 @@ def BA_generator(N, m, m0):
 
         n+=1
         nE+=m
-    print()
+    #print()
     for i in range (N):
         for j in range(N):
             if adjencyMatrix[i][j]==1:
@@ -72,4 +72,4 @@ def BA_generator(N, m, m0):
     return adjencyMatrix
 
 
-BA_generator(200,2,3)
+BA_generator(5000,2,3)
